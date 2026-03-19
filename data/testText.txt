@@ -1,0 +1,134 @@
+public class CommunicationProtocol {
+    // Control characters for data transmission
+    private static final byte  = 0x16;  //  character
+    private static final byte  = 0x02;  // Start of Text
+    private static final byte  = 0x03;  // End of Text
+    private static final byte  = 0x10;  // Data Link Escape
+    private static final byte SOH = 0x01;  // Start of Header
+    private static final byte EOT = 0x04;  // End of Transmission
+    private static final byte ENQ = 0x05;  // Enquiry
+    private static final byte ACK = 0x06;  // Acknowledge
+    private static final byte NAK = 0x15;  // Negative Acknowledge
+    private static final byte CAN = 0x18;  // Cancel
+    private static final byte ESC = 0x1B;  // Escape
+
+    public static void main(String[] args) {
+        System.out.println("Communication protocol initialized.");
+        System.out.printf(": 0x%02X\n", SYN);
+        System.out.printf(": 0x%02X\n", );
+        System.out.printf(": 0x%02X\n", );
+        System.out.printf(": 0x%02X\n", );
+        System.out.printf("SOH: 0x%02X\n", SOH);
+        System.out.printf("EOT: 0x%02X\n", EOT);
+        System.out.printf("ENQ: 0x%02X\n", ENQ);
+        System.out.printf("ACK: 0x%02X\n", ACK);
+        System.out.printf("NAK: 0x%02X\n", NAK);
+        System.out.printf("CAN: 0x%02X\n", CAN);
+        System.out.printf("ESC: 0x%02X\n", ESC);
+    }
+}
+
+Lo! In the boundless realm where pulses race,
+A dance of signals weaves through time and space.
+No errant noise shall mar this noble quest,
+For framing guides the message to its rest.
+
+When SYN doth chime, the herald calls anew,
+A bond is formed, a channel fair and true.
+Then SOH proclaims: “Attend! Attend! O’ sight!
+For data’s birth begins in ordered light.”
+
+With , the parchment fair unrolls,
+Each bit, a scribe, its tale precisely told.
+And lest the tale be lost in lawless night,
+ doth guard, ensuring all is right.
+
+Yet mark thee well, when story doth complete,
+ doth close the tome in manner meet.
+No jester’s hand may twist the words therein,
+Nor creeping chaos shroud the frame in sin.
+
+What fate befalls a lost and wandering call?
+Lo! NAK rebukes, yet mercy crowns it all!
+For ACK, like knighthood's noble vow,
+Doth grant the words safe passage now.
+
+Thus let the bytes in sacred order flow,
+And by this frame let knowledge brightly glow.
+A dance of signals, swift and bright,
+Through framing’s grace, we bring to light!
+
+
+The Tale of SYNderella and the Royal Frame
+
+Once upon a time, in the vast and structured realm of Datastream, there lived a humble yet graceful byte named SYNderella. She was once part of a noble data packet, but misfortune struck when her parent packet was fragmented, leaving her at the mercy of her cruel step-bytes, NAK and CAN, who constantly corrupted her transmissions and discarded her from their frames.
+
+Each day, SYNderella toiled endlessly, cleaning noisy signals, correcting errors, and ensuring the smooth transmission of her step-bytes while they relished their dominant positions in the stream. They mocked her, saying, "You, a mere synchronization character, shall never find a proper frame to belong to!"
+
+One day, a royal announcement arrived: The great Prince ACK, heir to the Transmission Kingdom, was to hold a grand protocol ball at the Data Palace, where he would seek the byte that could establish the most flawless connection. All the data in the realm longed to be chosen, for to be acknowledged by ACK meant eternal validation.
+
+Excited, SYNderella rushed to prepare, but her wicked step-bytes laughed. CAN canceled her request to attend, while NAK denied her access outright. They left her behind, their frames complete while she remained in the buffer, unprocessed and alone.
+
+Just as her signals grew weak, a mystical entity appeared—her Frame Fairy, the noble . "Fear not, SYNderella," he said. "I shall encode you in a secure transmission, ensuring you arrive at the ball undisturbed." With a swift bitwise operation, he wrapped SYNderella in a Start of Header (SOH) and a Start of Text (), shielding her from corruption.
+
+At the palace, Prince ACK was growing weary. Though many bytes had arrived, none could maintain a seamless handshake with him. Some were too noisy, others dropped packets, and some were simply out of sync. Just as he was about to terminate the ball with an End of Transmission (EOT), SYNderella entered the frame.
+
+The moment she appeared, the transmission stabilized. The entire network hushed as her presence synchronized the data stream. ACK extended his hand, and together they exchanged perfect packets. He had finally found his ideal match!
+
+But as the connection grew stronger, SYNderella suddenly realized that her  magic would only last until the buffer was flushed. As the clock struck midnight, she panicked and fled, leaving behind only a single Start of Frame (SOF)—her only trace.
+
+Prince ACK, determined to find her, searched the entire realm of Datastream. He tested every frame until he finally found the one that perfectly synchronized with the lost SOF. SYNderella was acknowledged at last, forever validated in the heart of the transmission.
+
+And thus, SYNderella and Prince ACK ruled the kingdom of Datastream, ensuring that every message was framed properly, acknowledged fairly, and transmitted without loss.
+
+And they lived happily ever after in perfect parity.
+
+SYNderella's Flow
+
+[Verse 1]
+Yo, I'm SYNderella, comin' through the stream,
+Lost in the packets, stuck in a dream.
+Step-bytes hatin', they wanna see me drop,
+But I'm framed up tight, yeah, I stay on top.
+
+ got my back, wrapped up so clean,
+Steppin’ to the palace, I’m the data queen.
+Got that SOH, I’m ready to start,
+A flawless transmission, straight from the heart.
+
+[Chorus]
+SYNderella on the beat, keep the frame tight,
+Ain’t no packet lost when I'm in sight.
+Start with , end with ,
+Prince ACK gonna find me next!
+
+[Verse 2]
+Step-bytes hatin’, NAK tryna block,
+CAN tryin' cancel, wanna see me drop.
+But I stay synced, yeah, I keep it fly,
+'s magic, I touch the sky!
+
+Through the kingdom, data in the air,
+They tryna corrupt, but I don’t care.
+EOT hit, midnight's near,
+Gotta dip quick, gotta disappear.
+
+[Chorus]
+SYNderella on the beat, keep the frame tight,
+Ain’t no packet lost when I'm in sight.
+Start with , end with ,
+Prince ACK gonna find me next!
+
+[Bridge]
+Now I’m ghost like ESC, left my trace,
+But the prince on the hunt, he know my place.
+Tracked that SOF, now he’s on my trail,
+A perfect match, yo, we never fail!
+
+[Outro]
+Now we rule the net, transmission tight,
+Ain’t no delay, we keep it right.
+SYNderella, framed in gold,
+Data flow strong, story told.
+
+
