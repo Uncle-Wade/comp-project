@@ -10,19 +10,18 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+// Receiver side of Stop-and-Wait ARQ.
 public class StopAndWaitARQ_Receiver {
 
     private static final byte ACK = 0x06; // ACK
     private static final byte NAK = 0X21; // NAK
-    private static final char MAX_SEQ_NUM = 255;
-    private static final char TOTAL_SEQ_NUM = (MAX_SEQ_NUM+1);
     private final int port;
     private final String outputFile;
     private ServerSocket serverSocket;
     private volatile boolean running;
     private final List<byte[]> receivedData;
     private int totalPacketsReceived;
-    private int currentPacketIndex; // points to current packet index
+    private int currentPacketIndex;
 
     public StopAndWaitARQ_Receiver(int port, String outputFile) {
         this.port = port;
@@ -43,38 +42,44 @@ public class StopAndWaitARQ_Receiver {
 
         while (running) {
             try{
-                // Read packet metadata
                 int packetLength = in.readInt();
                 char packetIndex = in.readChar();
                 boolean isLastPacket = in.readBoolean();
 
-                // Read packet data
                 byte[] packetData = new byte[packetLength];
                 in.readFully(packetData);
                 BISYNCPacket packet = new BISYNCPacket(packetData, true);
 
-                // TODO: Task 2.b, Your code below
-                if (packet.isValid() && !isLastPacket) {
-                    receivedData.add(packet.getData());
-                    out.writeChar(ACK);
-                    out.writeChar((packetIndex + 1) % 256);
-                    totalPacketsReceived++;
-                    currentPacketIndex++;
-                    System.out.println("ACK " + currentPacketIndex + " Received!");
-                } else if (packet.isValid() && isLastPacket) {
-                    receivedData.add(packet.getData());
-                    out.writeChar(ACK);
-                    out.writeChar((packetIndex + 1) % 256);
-                    totalPacketsReceived++;
-                    System.out.println("ACK " + currentPacketIndex + " Received! That makes: " + totalPacketsReceived);
-                    stop();
-                } else {
+                // Bad checksum means receiver asks for the same packet again.
+                if (!packet.isValid()) {
                     out.writeChar(NAK);
-                    out.writeChar(packetIndex);
-                    System.out.println("NAK " + currentPacketIndex + " Received! Resending: Packet " + currentPacketIndex);
+                    out.writeChar((char) (currentPacketIndex % 256));
+                    out.flush();
+                    continue;
                 }
 
+                if ((int) packetIndex == (currentPacketIndex % 256)) {
+                    // This is the packet we were waiting for, so store it.
+                    ensureCapacity(currentPacketIndex);
+                    receivedData.set(currentPacketIndex, packet.getData());
+                    totalPacketsReceived++;
+                    currentPacketIndex++;
 
+                    // ACK carries the next sequence number expected.
+                    out.writeChar(ACK);
+                    out.writeChar((char) (currentPacketIndex % 256));
+                    out.flush();
+
+                    if (isLastPacket) {
+                        stop();
+                    }
+                } else {
+                    // Duplicate packet: do not store it twice, just repeat the ACK
+                    // so the sender knows what we still expect.
+                    out.writeChar(ACK);
+                    out.writeChar((char) (currentPacketIndex % 256));
+                    out.flush();
+                }
 
             } catch (IOException e) {
                 if (running) {
@@ -83,9 +88,7 @@ public class StopAndWaitARQ_Receiver {
             }
         }
 
-        // after receive all the packets, save them into the output file
         saveFile();
-
     }
 
     private void ensureCapacity(int index) {
@@ -96,7 +99,6 @@ public class StopAndWaitARQ_Receiver {
 
     private void saveFile() {
         try {
-            // Calculate total size
             int totalSize = 0;
             for (byte[] data : receivedData) {
                 if (data != null) {
@@ -104,7 +106,6 @@ public class StopAndWaitARQ_Receiver {
                 }
             }
 
-            // Combine all packets
             byte[] completeFile = new byte[totalSize];
             int offset = 0;
             for (byte[] data : receivedData) {
@@ -114,11 +115,10 @@ public class StopAndWaitARQ_Receiver {
                 }
             }
 
-            // Write to file
             Files.write(Paths.get(outputFile), completeFile);
             System.out.println("File saved successfully: " + outputFile);
         } catch (IOException e) {
-            System.err.println("Error saving video file: " + e.getMessage());
+            System.err.println("Error saving file: " + e.getMessage());
         }
     }
 

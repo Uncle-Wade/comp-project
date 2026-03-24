@@ -3,11 +3,12 @@ package protocols;
 import java.io.IOException;
 import java.util.List;
 
+// Sender side of Stop-and-Wait ARQ.
 public class StopAndWaitARQ_Sender {
     private static final byte ACK = 0x06; // ACK
     private static final byte NAK = 0X21; // NAK
     private final NetworkSender sender;
-    private char currSeqNumber = 0; // 0 - 255
+    private char currSeqNumber = 0; // sequence number range is 0-255
 
     public StopAndWaitARQ_Sender(NetworkSender sender){
         this.sender = sender;
@@ -20,32 +21,26 @@ public class StopAndWaitARQ_Sender {
             boolean packetReceived = false;
             boolean isLastPacket = (i == packets.size() - 1);
 
-            // TODO: Task 2.a, Your code below
-            // notice: use sender.sendPacketWithError() to send out packet
-
             while (!packetReceived) {
                 try {
-                    sender.sendPacketWithError(packet, currSeqNumber,isLastPacket);
+                    // Send the current frame and wait until the receiver
+                    // confirms it with the next expected sequence number.
+                    sender.sendPacketWithError(packet, currSeqNumber, isLastPacket);
+                    char[] response = sender.waitForResponse();
 
-                    char[] reply = sender.waitForResponse();
-
-                    if (reply[0] == ACK) {
+                    if (response[0] == ACK && response[1] == (char) ((currSeqNumber + 1) % 256)) {
+                        // Correct ACK means the receiver got this packet,
+                        // so we can move on to the next one.
                         packetReceived = true;
-                    } else if (reply[0] == NAK) {
-                        char nakFrame = reply[1];
-                        sender.sendPacketWithError(packet,nakFrame,isLastPacket);
+                        currSeqNumber = (char) ((currSeqNumber + 1) % 256);
+                    } else if (response[0] == NAK && response[1] == currSeqNumber) {
+                        // Receiver detected corruption, so resend same packet.
+                        System.out.println("Sender: retransmitting packet " + (int) currSeqNumber);
                     }
-
-                    currSeqNumber = (char) ((reply[1] + 1) % 256);
-
-
                 } catch (IOException e) {
-                    System.err.println("File error: " + e.getMessage());
+                    throw new RuntimeException("Error transmitting packet " + i, e);
                 }
             }
-
         }
     }
-
-
 }
