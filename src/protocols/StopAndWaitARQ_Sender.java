@@ -20,32 +20,21 @@ public class StopAndWaitARQ_Sender {
             boolean packetReceived = false;
             boolean isLastPacket = (i == packets.size() - 1);
 
-            // TODO: Task 2.a, Your code below
-            // notice: use sender.sendPacketWithError() to send out packet
-
             while (!packetReceived) {
                 try {
-                    sender.sendPacketWithError(packet, currSeqNumber,isLastPacket);
+                    sender.sendPacketWithError(packet, currSeqNumber, isLastPacket);
+                    char[] response = sender.waitForResponse();
 
-                    char[] reply = sender.waitForResponse();
-
-                    if (reply[0] == ACK) {
+                    if (response[0] == ACK && response[1] == (char) ((currSeqNumber + 1) % 256)) {
                         packetReceived = true;
-                    } else if (reply[0] == NAK) {
-                        char nakFrame = reply[1];
-                        sender.sendPacketWithError(packet,nakFrame,isLastPacket);
+                        currSeqNumber = (char) ((currSeqNumber + 1) % 256);
+                    } else if (response[0] == NAK && response[1] == currSeqNumber) {
+                        System.out.println("Sender: retransmitting packet " + (int) currSeqNumber);
                     }
-
-                    currSeqNumber = (char) ((reply[1] + 1) % 256);
-
-
                 } catch (IOException e) {
-                    System.err.println("File error: " + e.getMessage());
+                    throw new RuntimeException("Error transmitting packet " + i, e);
                 }
             }
-
         }
     }
-
-
 }

@@ -1,58 +1,73 @@
 package protocols;
 
-
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class SelectiveAndRepeatARQ_Sender {
 
     private static final byte ACK = 0x06; // ACK
     private static final byte NAK = 0X21; // NAK
-    private static final char MAX_SEQ_NUM = 255;
-    private static final char TOTAL_SEQ_NUM = (MAX_SEQ_NUM+1);
     private final NetworkSender sender;
     private int winBase = 0;
-    private int winSize = 0;
+    private final int winSize;
 
     public SelectiveAndRepeatARQ_Sender(NetworkSender sender, int winSize){
         this.sender = sender;
-        // Sliding window
         this.winBase = 0;
         this.winSize = winSize;
     }
 
     public void transmit(List<BISYNCPacket> packets) throws IOException {
-
-        // Handshake
         int N = packets.size();
         sender.sendHandshakeRequest(N, winSize);
         char[] response = sender.waitForResponse();
         if(response[0] != ACK) {
             System.out.println("Handshake failed, exit");
-        }else{
+            return;
+        } else {
             System.out.println("Handshake succeed, proceed!");
         }
 
-        Boolean finished = false;
-
-        // TODO: Task 3.a, Your code below
+        boolean finished = false;
+        boolean[] sent = new boolean[N];
 
         while(!finished){
-            //try {
-                // notice: use sender.sendPacketWithLost() to send out packet
-                // but, to resend the lost packet after receiving NAK,
-                // use sender.sendPacket(), otherwise, the receiver may not get the resent packet and get stuck
-                // also, for the last packet, use sender.sendPacket(), otherwise, it will get stuck
+            for (int i = winBase; i < Math.min(N, winBase + winSize); i++) {
+                if (!sent[i]) {
+                    boolean isLastPacket = (i == N - 1);
+                    char seqNum = (char) (i % 256);
+                    if (isLastPacket) {
+                        sender.sendPacket(packets.get(i).getPacket(), seqNum, true);
+                    } else {
+                        sender.sendPacketWithLost(packets.get(i), seqNum, false);
+                    }
+                    sent[i] = true;
+                }
+            }
 
-
-
-            //}catch (IOException e){
-            //    System.err.println("Error transmitting packet: " + e.getMessage());
-            //    return;
-            //}
+            char[] ackNak = sender.waitForResponse();
+            if (ackNak[0] == ACK) {
+                int ackNum = ackNak[1];
+                int newBase = winBase;
+                while (newBase < N && (newBase % 256) != ackNum) {
+                    newBase++;
+                }
+                if (newBase > winBase) {
+                    winBase = newBase;
+                }
+                if (winBase >= N) {
+                    finished = true;
+                }
+            } else if (ackNak[0] == NAK) {
+                int missingSeq = ackNak[1];
+                for (int i = winBase; i < Math.min(N, winBase + winSize); i++) {
+                    if ((i % 256) == missingSeq) {
+                        boolean isLastPacket = (i == N - 1);
+                        sender.sendPacket(packets.get(i).getPacket(), (char) missingSeq, isLastPacket);
+                        break;
+                    }
+                }
+            }
         }
     }
-
 }
