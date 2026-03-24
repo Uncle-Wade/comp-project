@@ -38,6 +38,8 @@ public class BISYNCPacket {
         // e.g. stuffed data has 8 bytes with 3 extra DLE: 0x01 DLE STX 0x02 DLE SYN DLE DLE
     private byte[] byteStuff(byte[] data) {
         // TODO: Task 1.a, your code below
+
+        // Creates and updates a counter that keeps track of how many DLEs are to be stuffed into the data
         int counter = 0;
         int byteLength = data.length;
         for (byte datum : data) {
@@ -46,9 +48,12 @@ public class BISYNCPacket {
             }
         }
 
+        // creates a new byte array big enough to include the original data and the new DLE bytes
         int stuffedLength = byteLength + counter;
         byte[] stuffed = new byte[stuffedLength];
 
+        // Cycles through the unstuffed data and builds the new stuffedData array by adding an extra DLE
+        // in the appropriate locations before the special bytes
         int index = 0;
         for (byte datum : data) {
             if (datum == SYN || datum == STX || datum == ETX || datum == DLE) {
@@ -58,6 +63,8 @@ public class BISYNCPacket {
                 stuffed[index++] = datum;
             }
         }
+
+        // returns the new stuffedData byte array
         return stuffed;
     }
 
@@ -68,16 +75,21 @@ public class BISYNCPacket {
     private byte[] byteUnstuff(byte[] stuffedData) {
         // TODO: Task 1.b, your code below
 
+        // Creates and tracks a counter for each DLE that needs to be unstuffed
         int count = 0;
         for (int i = 0; i < stuffedData.length - 1; i++) {
-            if (stuffedData[i] == DLE) {
+            if (stuffedData[i] == DLE) { // When it sees DLE, add a counter and then skip an entry in the for loop to
+                                        // ignore the next special byte that caused the stuffed DLE (including other valid DLEs)
                 count += 1;
                 i++;
             }
         }
 
+        // Creates new byte array to populate with the unstuffed data after removing the excess DLEs
         byte[] unstuffed = new byte[stuffedData.length - count];
 
+        // Loops through the stuffedData byte array and builds the new Unstuffed byte
+        // array by detecting and skipping over the DLEs that need to be removed
         int index1 = 0;
         for (int i = 0; i < stuffedData.length; i++) {
             if (stuffedData[i] == DLE && i + 1 < stuffedData.length) {
@@ -88,6 +100,7 @@ public class BISYNCPacket {
             }
         }
 
+        // returns the new unstuffed byte array
         return unstuffed;
     }
 
