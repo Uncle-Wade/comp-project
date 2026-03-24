@@ -93,7 +93,7 @@ public class NetworkSender {
         // Simulate transmission errors
         if (random.nextDouble() < lostRate) {
             // assume this packet is lost
-            System.out.println("Sender: packetIndex " + (int)packetIndex + " get lost");
+            System.out.println("Sender: packetIndex " + (int)packetIndex + " got lost");
             ++numOfLostPackets;
             return true;
         }

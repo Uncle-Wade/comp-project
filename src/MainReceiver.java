@@ -21,7 +21,7 @@ public class MainReceiver {
             //receiver.start();
 
             // 2. uncomment the code below to test Selective-and-Repeat ARQ
-             SelectiveAndRepeatARQ_Receiver receiver = new SelectiveAndRepeatARQ_Receiver(PORT, 4, OUTPUT_FILE);
+            SelectiveAndRepeatARQ_Receiver receiver = new SelectiveAndRepeatARQ_Receiver(PORT, 4, OUTPUT_FILE);
             receiver.start();
 
         } catch (Exception e) {
