@@ -3,6 +3,7 @@ package protocols;
 import java.io.IOException;
 import java.util.List;
 
+// Sender side of Selective Repeat ARQ.
 public class SelectiveAndRepeatARQ_Sender {
 
     private static final byte ACK = 0x06; // ACK
@@ -19,6 +20,8 @@ public class SelectiveAndRepeatARQ_Sender {
 
     public void transmit(List<BISYNCPacket> packets) throws IOException {
         int N = packets.size();
+
+        // Receiver needs to know total packet count and window size first.
         sender.sendHandshakeRequest(N, winSize);
         char[] response = sender.waitForResponse();
         if(response[0] != ACK) {
@@ -32,10 +35,13 @@ public class SelectiveAndRepeatARQ_Sender {
         boolean[] sent = new boolean[N];
 
         while(!finished){
+            // Fill the current sending window.
             for (int i = winBase; i < Math.min(N, winBase + winSize); i++) {
                 if (!sent[i]) {
                     boolean isLastPacket = (i == N - 1);
                     char seqNum = (char) (i % 256);
+
+                    // Non-last packets can be intentionally dropped to simulate loss.
                     if (isLastPacket) {
                         sender.sendPacket(packets.get(i).getPacket(), seqNum, true);
                     } else {
@@ -49,6 +55,9 @@ public class SelectiveAndRepeatARQ_Sender {
             if (ackNak[0] == ACK) {
                 int ackNum = ackNak[1];
                 int newBase = winBase;
+
+                // ACK contains the first sequence number not yet received in order,
+                // so slide the sender window up to that point.
                 while (newBase < N && (newBase % 256) != ackNum) {
                     newBase++;
                 }
@@ -60,6 +69,8 @@ public class SelectiveAndRepeatARQ_Sender {
                 }
             } else if (ackNak[0] == NAK) {
                 int missingSeq = ackNak[1];
+
+                // Only resend the missing packet requested by the receiver.
                 for (int i = winBase; i < Math.min(N, winBase + winSize); i++) {
                     if ((i % 256) == missingSeq) {
                         boolean isLastPacket = (i == N - 1);

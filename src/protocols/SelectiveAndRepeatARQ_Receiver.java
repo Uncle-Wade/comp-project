@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// Receiver side of Selective Repeat ARQ.
 public class SelectiveAndRepeatARQ_Receiver {
 
     private static final byte ACK = 0x06; // ACK
@@ -47,6 +48,7 @@ public class SelectiveAndRepeatARQ_Receiver {
 
         Set<Integer> nakPackets = new HashSet<>();
 
+        // Initial handshake: sender tells receiver how many packets to expect.
         int N = in.readInt();
         int winSize = in.readInt();
         out.writeChar(ACK);
@@ -70,6 +72,7 @@ public class SelectiveAndRepeatARQ_Receiver {
                 in.readFully(packetData);
                 BISYNCPacket packet = new BISYNCPacket(packetData, true);
 
+                // Corrupted packet: request the packet at the current base again.
                 if (!packet.isValid()) {
                     out.writeChar(NAK);
                     out.writeChar((char) (winBase % 256));
@@ -85,6 +88,7 @@ public class SelectiveAndRepeatARQ_Receiver {
                     }
                 }
 
+                // Ignore packets that are outside the current receive window.
                 if (absoluteIndex == -1) {
                     out.writeChar(ACK);
                     out.writeChar((char) (winBase % 256));
@@ -92,6 +96,7 @@ public class SelectiveAndRepeatARQ_Receiver {
                     continue;
                 }
 
+                // Store any new packet, even if it arrived out of order.
                 if (!flags[absoluteIndex]) {
                     flags[absoluteIndex] = true;
                     receivedData.set(absoluteIndex, packet.getData());
@@ -99,6 +104,8 @@ public class SelectiveAndRepeatARQ_Receiver {
                 }
 
                 if (absoluteIndex == winBase) {
+                    // Once the base packet arrives, move the window forward over
+                    // any already-buffered packets that are now contiguous.
                     while (winBase < N && flags[winBase]) {
                         nakPackets.remove(winBase);
                         winBase++;
@@ -107,6 +114,7 @@ public class SelectiveAndRepeatARQ_Receiver {
                     out.writeChar((char) (winBase % 256));
                     out.flush();
                 } else {
+                    // If there are missing packets before this one, request them.
                     for (int i = winBase; i < absoluteIndex; i++) {
                         if (!flags[i] && !nakPackets.contains(i)) {
                             out.writeChar(NAK);

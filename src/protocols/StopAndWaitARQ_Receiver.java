@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+// Receiver side of Stop-and-Wait ARQ.
 public class StopAndWaitARQ_Receiver {
 
     private static final byte ACK = 0x06; // ACK
@@ -49,6 +50,7 @@ public class StopAndWaitARQ_Receiver {
                 in.readFully(packetData);
                 BISYNCPacket packet = new BISYNCPacket(packetData, true);
 
+                // Bad checksum means receiver asks for the same packet again.
                 if (!packet.isValid()) {
                     out.writeChar(NAK);
                     out.writeChar((char) (currentPacketIndex % 256));
@@ -57,11 +59,13 @@ public class StopAndWaitARQ_Receiver {
                 }
 
                 if ((int) packetIndex == (currentPacketIndex % 256)) {
+                    // This is the packet we were waiting for, so store it.
                     ensureCapacity(currentPacketIndex);
                     receivedData.set(currentPacketIndex, packet.getData());
                     totalPacketsReceived++;
                     currentPacketIndex++;
 
+                    // ACK carries the next sequence number expected.
                     out.writeChar(ACK);
                     out.writeChar((char) (currentPacketIndex % 256));
                     out.flush();
@@ -70,6 +74,8 @@ public class StopAndWaitARQ_Receiver {
                         stop();
                     }
                 } else {
+                    // Duplicate packet: do not store it twice, just repeat the ACK
+                    // so the sender knows what we still expect.
                     out.writeChar(ACK);
                     out.writeChar((char) (currentPacketIndex % 256));
                     out.flush();
