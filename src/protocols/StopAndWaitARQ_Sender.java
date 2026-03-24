@@ -1,5 +1,6 @@
 package protocols;
 
+import java.io.IOException;
 import java.util.List;
 
 public class StopAndWaitARQ_Sender {
@@ -21,6 +22,27 @@ public class StopAndWaitARQ_Sender {
 
             // TODO: Task 2.a, Your code below
             // notice: use sender.sendPacketWithError() to send out packet
+
+            while (!packetReceived) {
+                try {
+                    sender.sendPacketWithError(packet, currSeqNumber,isLastPacket);
+
+                    char[] reply = sender.waitForResponse();
+
+                    if (reply[0] == ACK) {
+                        packetReceived = true;
+                    } else if (reply[0] == NAK) {
+                        char nakFrame = reply[1];
+                        sender.sendPacketWithError(packet,nakFrame,isLastPacket);
+                    }
+
+                    currSeqNumber = (char) ((reply[1] + 1) % 256);
+
+
+                } catch (IOException e) {
+                    System.err.println("File error: " + e.getMessage());
+                }
+            }
 
         }
     }

@@ -38,7 +38,26 @@ public class BISYNCPacket {
         // e.g. stuffed data has 8 bytes with 3 extra DLE: 0x01 DLE STX 0x02 DLE SYN DLE DLE
     private byte[] byteStuff(byte[] data) {
         // TODO: Task 1.a, your code below
-        byte[] stuffed = new byte[1];
+        int counter = 0;
+        int byteLength = data.length;
+        for (byte datum : data) {
+            if (datum == SYN || datum == STX || datum == ETX || datum == DLE) {
+                counter++;
+            }
+        }
+
+        int stuffedLength = byteLength + counter;
+        byte[] stuffed = new byte[stuffedLength];
+
+        int index = 0;
+        for (byte datum : data) {
+            if (datum == SYN || datum == STX || datum == ETX || datum == DLE) {
+                stuffed[index++] = DLE;
+                stuffed[index++] = datum;
+            } else {
+                stuffed[index++] = datum;
+            }
+        }
         return stuffed;
     }
 
@@ -48,7 +67,27 @@ public class BISYNCPacket {
     // e.g. raw data has 5 bytes with 3 special bytes: 0x01 STX 0x02 SYN DLE
     private byte[] byteUnstuff(byte[] stuffedData) {
         // TODO: Task 1.b, your code below
-        byte[] unstuffed = new byte[1];
+
+        int count = 0;
+        for (int i = 0; i < stuffedData.length - 1; i++) {
+            if (stuffedData[i] == DLE) {
+                count += 1;
+                i++;
+            }
+        }
+
+        byte[] unstuffed = new byte[stuffedData.length - count];
+
+        int index1 = 0;
+        for (int i = 0; i < stuffedData.length; i++) {
+            if (stuffedData[i] == DLE && i + 1 < stuffedData.length) {
+                i++;
+                unstuffed[index1++] = stuffedData[i];
+            } else {
+                unstuffed[index1++] = stuffedData[i];
+            }
+        }
+
         return unstuffed;
     }
 

@@ -54,7 +54,25 @@ public class StopAndWaitARQ_Receiver {
                 BISYNCPacket packet = new BISYNCPacket(packetData, true);
 
                 // TODO: Task 2.b, Your code below
-
+                if (packet.isValid() && !isLastPacket) {
+                    receivedData.add(packet.getData());
+                    out.writeChar(ACK);
+                    out.writeChar((packetIndex + 1) % 256);
+                    totalPacketsReceived++;
+                    currentPacketIndex++;
+                    System.out.println("ACK " + currentPacketIndex + " Received!");
+                } else if (packet.isValid() && isLastPacket) {
+                    receivedData.add(packet.getData());
+                    out.writeChar(ACK);
+                    out.writeChar((packetIndex + 1) % 256);
+                    totalPacketsReceived++;
+                    System.out.println("ACK " + currentPacketIndex + " Received! That makes: " + totalPacketsReceived);
+                    stop();
+                } else {
+                    out.writeChar(NAK);
+                    out.writeChar(packetIndex);
+                    System.out.println("NAK " + currentPacketIndex + " Received! Resending: Packet " + currentPacketIndex);
+                }
 
 
 
