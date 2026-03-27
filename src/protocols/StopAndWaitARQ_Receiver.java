@@ -10,6 +10,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Author: Wade Douglas, Jay Laird
+ * Course: COMP 342 Data Communications and Networking
+ * Date: 3-23-2026
+ * File: StopAndWaitARQ_Receiver.java
+ * Description: Implements the receiver logic for Stop-and-Wait ARQ, including checksum validation and ACK/NAK responses.
+ */
+
 // Receiver side of Stop-and-Wait ARQ.
 public class StopAndWaitARQ_Receiver {
 

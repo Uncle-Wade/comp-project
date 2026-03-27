@@ -1,5 +1,11 @@
 package protocols;
-
+/**
+ * Author: Wade Douglas, Jay Laird
+ * Course: COMP 342 Data Communications and Networking
+ * Date: 3-23-2026
+ * File: BISYNCPacket.java
+ * Description: Defines the BISYNCPacket structure and handles packet creation, checksum logic, and byte stuffing/unstuffing.
+ */
 import java.io.ByteArrayOutputStream;
 
 // Packet class used to build and parse BISYNC-style frames.

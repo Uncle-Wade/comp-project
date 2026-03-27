@@ -3,7 +3,14 @@ package protocols;
 import java.io.IOException;
 import java.util.List;
 
-// Sender side of Stop-and-Wait ARQ.
+/**
+ * Author: Wade Douglas, Jay Laird
+ * Course: COMP 342 Data Communications and Networking
+ * Date: 3-23-2026
+ * File: StopAndWaitARQ_Sender.java
+ * Description: Implements the sender logic for Stop-and-Wait ARQ, including retransmission on NAK or invalid response.
+ */
+
 public class StopAndWaitARQ_Sender {
     private static final byte ACK = 0x06; // ACK
     private static final byte NAK = 0X21; // NAK

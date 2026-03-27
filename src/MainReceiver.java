@@ -4,8 +4,8 @@ import protocols.SelectiveAndRepeatARQ_Receiver;
 
 public class MainReceiver {
     private static final int PORT = 8080;
-    private static String OUTPUT_FILE = "received_file.dat";
-    // private static String OUTPUT_FILE = "received_file.jpg";
+    //private static String OUTPUT_FILE = "received_file.dat";
+     private static String OUTPUT_FILE = "received_file.jpg";
 
     public static void main(String[] args) {
         if (args.length >= 1) {

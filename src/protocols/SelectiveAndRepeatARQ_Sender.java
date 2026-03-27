@@ -3,6 +3,14 @@ package protocols;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Author: Wade Douglas, Jay Laird
+ * Course: COMP 342 Data Communications and Networking
+ * Date: 3-23-2026
+ * File: SelectiveAndRepeatARQ_Sender.java
+ * Description: Implements the sender side of Selective-Repeat ARQ using a sliding window and retransmission of missing packets.
+ */
+
 // Sender side of Selective Repeat ARQ.
 public class SelectiveAndRepeatARQ_Sender {
 

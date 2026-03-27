@@ -12,6 +12,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Author: Wade Douglas, Jay Laird
+ * Course: COMP 342 Data Communications and Networking
+ * Date: 3-23-2026
+ * File: SelectiveAndRepeatARQ_Receiver.java
+ * Description: Implements the receiver side of Selective-Repeat ARQ, buffering packets, detecting missing frames, and sending ACK/NAK responses.
+ */
+
 // Receiver side of Selective Repeat ARQ.
 public class SelectiveAndRepeatARQ_Receiver {
 
